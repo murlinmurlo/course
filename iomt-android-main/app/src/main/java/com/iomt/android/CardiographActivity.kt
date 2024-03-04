@@ -22,6 +22,7 @@ import java.nio.ByteBuffer
 import java.util.UUID
 
 
+
 class CardiographActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCardiographBinding
     private val deviceAddress = "88:6B:0F:8B:7F:29"
@@ -49,90 +50,106 @@ class CardiographActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                MonitoringMode(seekBar)
+                //MonitoringMode(seekBar)
             }
         })
 
-    }
+        binding.onClickStartSession.setOnClickListener {
 
-
-    fun init(){
-
-        // Проверка доступности Bluetooth
-        val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
-        if (bluetoothAdapter == null) {
-            // Устройство не поддерживает Bluetooth
-        }
-
-        // Включение Bluetooth
-        if (!bluetoothAdapter?.isEnabled!!) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    // Bluetooth включен
-                } else {
-                    // Пользователь отклонил запрос на включение Bluetooth
+                var text = binding.onClickStartSession.text
+                when (text) {
+                    "Start session" -> {
+                        text = "Stop session"
+                        "Stop session"
+                    }
+                    else -> {
+                        text = "Start session"
+                        "Start session"
+                    }
                 }
-            }.launch(enableBtIntent)
+            }
+            //MonitoringMode()
         }
 
-        // Поиск устройств
-        if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.BLUETOOTH_SCAN
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
-        bluetoothAdapter?.startDiscovery()
-
-        // Подключение к устройству
-        val device: BluetoothDevice? = bluetoothAdapter?.getRemoteDevice(deviceAddress)
-        val socket: BluetoothSocket? = device?.createRfcommSocketToServiceRecord(UUID.fromString(uuid))
-        Thread {
-            socket?.connect()
-            inputStream = socket?.inputStream
-            outputStream = socket?.outputStream
-        }.start()
     }
 
-    private fun ReadDeviceInformation() {
-        val buf = ByteBuffer.allocate(4)
 
-        buf.putChar(0.toChar()); // version
-        buf.putChar(0.toChar()); // command ReadDeviceInformation
+fun init(){
 
-        //outputStream?.write(buf.array())?.toString()
-
-        binding.showDeviceInformation.text = outputStream?.write(buf.array())?.toString()
-        binding.showDeviceInformation.visibility = View.VISIBLE
-
+    // Проверка доступности Bluetooth
+    val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+    if (bluetoothAdapter == null) {
+        // Устройство не поддерживает Bluetooth
     }
 
-    private fun ReadDeviceStatus() {
-        val buf = ByteBuffer.allocate(4)
-
-        buf.putChar(0.toChar()); // version
-        buf.putChar(1.toChar()); // command ReadDeviceStatus
-
-        outputStream?.write(buf.array())
+    // Включение Bluetooth
+    if (!bluetoothAdapter?.isEnabled!!) {
+        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // Bluetooth включен
+            } else {
+                // Пользователь отклонил запрос на включение Bluetooth
+            }
+        }.launch(enableBtIntent)
     }
 
-    private fun MonitoringMode(samplingRate: SeekBar) {
-        val buf = ByteBuffer.allocate(4)
-
-        buf.putChar(0.toChar()); // version
-        buf.putChar(4.toChar()); // command MonitoringMode
-        buf.putChar(findViewById<SeekBar>(R.id.rateSlider).progress.toChar()); // set 1000 Hz
-
-        outputStream?.write(buf.array())
+    // Поиск устройств
+    if (ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.BLUETOOTH_SCAN
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        // TODO: Consider calling
+        //    ActivityCompat#requestPermissions
+        // here to request the missing permissions, and then overriding
+        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        //                                          int[] grantResults)
+        // to handle the case where the user grants the permission. See the documentation
+        // for ActivityCompat#requestPermissions for more details.
+        return
     }
+    bluetoothAdapter?.startDiscovery()
+
+    // Подключение к устройству
+    val device: BluetoothDevice? = bluetoothAdapter?.getRemoteDevice(deviceAddress)
+    val socket: BluetoothSocket? = device?.createRfcommSocketToServiceRecord(UUID.fromString(uuid))
+    Thread {
+        socket?.connect()
+        inputStream = socket?.inputStream
+        outputStream = socket?.outputStream
+    }.start()
+}
+
+private fun ReadDeviceInformation() {
+    val buf = ByteBuffer.allocate(4)
+
+    buf.putChar(0.toChar()); // version
+    buf.putChar(0.toChar()); // command ReadDeviceInformation
+
+    //outputStream?.write(buf.array())?.toString()
+
+    binding.showDeviceInformation.text = outputStream?.write(buf.array())?.toString()
+    binding.showDeviceInformation.visibility = View.VISIBLE
+
+}
+
+private fun ReadDeviceStatus() {
+    val buf = ByteBuffer.allocate(4)
+
+    buf.putChar(0.toChar()); // version
+    buf.putChar(1.toChar()); // command ReadDeviceStatus
+
+    outputStream?.write(buf.array())
+}
+
+private fun MonitoringMode(samplingRate: SeekBar) {
+    val buf = ByteBuffer.allocate(4)
+
+    buf.putChar(0.toChar()); // version
+    buf.putChar(4.toChar()); // command MonitoringMode
+    buf.putChar(findViewById<SeekBar>(R.id.rateSlider).progress.toChar()); // set 1000 Hz
+
+    outputStream?.write(buf.array())
 }
 

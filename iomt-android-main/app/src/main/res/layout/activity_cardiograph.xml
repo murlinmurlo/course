@@ -14,10 +14,9 @@
         android:text="Device Information"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.837" />
+        app:layout_constraintVertical_bias="0.904" />
 
     <TextView
         android:id="@+id/showDeviceInformation"
@@ -51,15 +50,28 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="1dp"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="1dp" />
 
     <com.iomt.android.EcgShowView
         android:id="@+id/ecgShow"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        tools:layout_editor_absoluteX="55dp"
-        tools:layout_editor_absoluteY="163dp" />
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/rateSlider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/onClickStartSession"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/lightYellow"
+        android:text="Button"
+        app:layout_constraintEnd_toEndOf="@+id/ecgShow"
+        app:layout_constraintStart_toStartOf="@+id/ecgShow"
+        tools:layout_editor_absoluteY="557dp"
+        tools:text="Start a session" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

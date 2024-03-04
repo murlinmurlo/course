@@ -26,7 +26,7 @@ class EcgShowView : View {
     private var mGridLinestrokeWidth: Float = 0.toFloat()
     private var mGridstrokeWidthAndHeight: Float = 0.toFloat()
 
-    // ЭКГ.
+    // ЭКГ
     private val MAX_VALUE = 20F // Пик
     private val HEART_LINE_STROKE_WIDTH = 5f
 
