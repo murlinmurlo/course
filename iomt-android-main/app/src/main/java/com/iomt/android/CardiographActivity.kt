@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +21,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.util.UUID
+import com.iomt.android.EcgShowView
 
 
 
@@ -68,7 +70,7 @@ class CardiographActivity : AppCompatActivity() {
                     }
                 }
 
-            MonitoringMode()
+            //MonitoringMode()
             }
         }
 
@@ -149,16 +151,14 @@ class CardiographActivity : AppCompatActivity() {
         buf.putChar(findViewById<SeekBar>(R.id.rateSlider).progress.toChar()); // set 1000 Hz
         outputStream?.write(buf.array())
 
-        ShowEcg("1,2,3,4,5,6,7,8,9,10")
-    }
+        val layout = findViewById<EcgShowView>(R.id.ecgShow)
+        val ecgShowView = EcgShowView(this, null)
+        //layout.addView(ecgShowView)  //зачем это тут вообще нужно???
 
-    private fun ShowEcg(dataStr){
-        val ecgShowView = EcgShowView(context)
+        val dataStr = "1,2,3,4,5" // Заменить
         ecgShowView.setData(dataStr)
-        val layout = binding.ecgShow
-        layout.addView(ecgShowView)
-
     }
+
 }
 
 
