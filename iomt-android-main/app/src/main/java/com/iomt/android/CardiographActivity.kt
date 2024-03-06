@@ -10,10 +10,7 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.SeekBar
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.iomt.android.databinding.ActivityCardiographBinding
@@ -58,21 +55,25 @@ class CardiographActivity : AppCompatActivity() {
 
         binding.onClickStartSession.setOnClickListener {
 
-                var text = binding.onClickStartSession.text
-                when (text) {
-                    "Start session" -> {
-                        text = "Stop session"
-                        "Stop session"
-                    }
-                    else -> {
-                        text = "Start session"
-                        "Start session"
-                    }
+            var text = binding.onClickStartSession.text
+            when (text) {
+                "Start session" -> {
+                    text = "Stop session"
+                    "Stop session"
                 }
+                else -> {
+                    text = "Start session"
+                    "Start session"
+                }
+            }
+            if (text == "Start session") {
+                MonitoringMode()
+            }
+            else {
 
-            //MonitoringMode()
             }
         }
+    }
 
 
     fun init(){
@@ -128,9 +129,13 @@ class CardiographActivity : AppCompatActivity() {
         buf.putChar(0.toChar()); // version
         buf.putChar(0.toChar()); // command ReadDeviceInformation
 
+        val response = ByteArray(1024)
+        val bytesRead = inputStream?.read(response)
+        val result = response.copyOfRange(0, bytesRead ?: 0).toString(Charsets.UTF_8)
+
         //outputStream?.write(buf.array())?.toString()
 
-        binding.showDeviceInformation.text = outputStream?.write(buf.array())?.toString()
+        binding.showDeviceInformation.text = result?.toString()
         binding.showDeviceInformation.visibility = View.VISIBLE
 
     }
@@ -144,7 +149,7 @@ class CardiographActivity : AppCompatActivity() {
         outputStream?.write(buf.array())
     }
 
-    private fun MonitoringMode(samplingRate: SeekBar) {
+    private fun MonitoringMode() {
         val buf = ByteBuffer.allocate(4)
         buf.putChar(0.toChar()); // version
         buf.putChar(4.toChar()); // command MonitoringMode
