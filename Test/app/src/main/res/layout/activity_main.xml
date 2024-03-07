@@ -37,7 +37,7 @@
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="300dp"
         android:layout_height="40dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="24dp"
         android:background="@color/white"
         android:indeterminateDrawable="@color/lightYellow"
         android:max="10"
@@ -49,18 +49,21 @@
         android:id="@+id/toolbar"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
         android:background="@color/lightYellow"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="1dp" />
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/onClickStartSession"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="100dp"
         android:backgroundTint="@color/lightYellow"
         android:text="Start a session"
         app:layout_constraintEnd_toEndOf="@+id/ecgShowView"

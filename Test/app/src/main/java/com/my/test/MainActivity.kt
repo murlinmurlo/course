@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private var inputStream: InputStream? = null
     private var outputStream: OutputStream? = null
     private val buffer = ByteArray(1024)
+    private var cardiogaphCommunication = CardiogaphCommunication()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +39,9 @@ class MainActivity : AppCompatActivity() {
         init()
 
         binding.onClickReadDeviceInformation.setOnClickListener {
-            ReadDeviceInformation()
+            var result = cardiogaphCommunication.ReadDeviceInformation()
+            binding.showDeviceInformation.text = result?.toString()
+            binding.showDeviceInformation.visibility = View.VISIBLE
         }
 
         val seekBar = findViewById<SeekBar>(R.id.rateSlider)
@@ -69,9 +72,7 @@ class MainActivity : AppCompatActivity() {
             if (text == "Start session") {
                 MonitoringMode()
             }
-            else {
-
-            }
+            else { }
         }
     }
 
@@ -123,31 +124,6 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
-    private fun ReadDeviceInformation() {
-        val buf = ByteBuffer.allocate(4)
-
-        buf.putChar(0.toChar()); // version
-        buf.putChar(0.toChar()); // command ReadDeviceInformation
-
-        val response = ByteArray(1024)
-        val bytesRead = inputStream?.read(response)
-        val result = response.copyOfRange(0, bytesRead ?: 0).toString(Charsets.UTF_8)
-
-        //outputStream?.write(buf.array())?.toString()
-
-        binding.showDeviceInformation.text = result?.toString()
-        binding.showDeviceInformation.visibility = View.VISIBLE
-
-    }
-
-    private fun ReadDeviceStatus() {
-        val buf = ByteBuffer.allocate(4)
-
-        buf.putChar(0.toChar()); // version
-        buf.putChar(1.toChar()); // command ReadDeviceStatus
-
-        outputStream?.write(buf.array())
-    }
 
     private fun MonitoringMode() {
         val buf = ByteBuffer.allocate(4)
