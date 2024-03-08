@@ -38,6 +38,10 @@ class CardiogaphCommunication {
         return sendCommand(3.toChar())
     }
 
+    fun PoverOff(): String {
+        return sendCommand(10.toChar())
+    }
+
     fun MonitoringMode(frequency: Char): String {
         val buf = ByteBuffer.allocate(4)
         buf.putChar(0.toChar()) // version
@@ -50,9 +54,5 @@ class CardiogaphCommunication {
         val result = response.copyOfRange(0, bytesRead ?: 0).toString(Charsets.UTF_8)
 
         return result
-    }
-
-    fun PoverOff(): String {
-        return sendCommand(10.toChar())
     }
 }
