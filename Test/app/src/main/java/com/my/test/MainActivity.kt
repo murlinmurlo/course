@@ -8,7 +8,10 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
 import android.widget.SeekBar
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,12 +34,25 @@ class MainActivity : AppCompatActivity() {
     private val buffer = ByteArray(1024)
     private var cardiogaphCommunication = CardiogaphCommunication()
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.cardiograph_menu, menu)
+        return true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        init()
+
+        supportActionBar?.apply {
+            setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.lightYellow)))
+            setDisplayHomeAsUpEnabled(true)
+            title = "Cardiograph"
+        }
+
+
+        BluetoothClassicConnecion()
 
         binding.onClickReadDeviceInformation.setOnClickListener {
             var result = cardiogaphCommunication.ReadDeviceInformation()
@@ -57,7 +73,8 @@ class MainActivity : AppCompatActivity() {
         })
 
         binding.onClickStartSession.setOnClickListener {
-
+            var frequency = findViewById<SeekBar>(R.id.rateSlider).progress.toChar()
+            var result = cardiogaphCommunication.MonitoringMode(frequency)
             var text = binding.onClickStartSession.text
             when (text) {
                 "Start session" -> {
@@ -69,16 +86,17 @@ class MainActivity : AppCompatActivity() {
                     "Start session"
                 }
             }
-            if (text == "Start session") {
-                MonitoringMode()
-            }
-            else { }
+            val layout = findViewById<EcgShowView>(R.id.ecgShow)
+            val ecgShowView = EcgShowView(this, null)
+            //layout.addView(ecgShowView)  //зачем это тут вообще нужно???
+
+            val dataStr = "1,2,3,4,5" // Заменить
+            ecgShowView.setData(dataStr)
         }
     }
 
 
-    fun init(){
-
+    fun BluetoothClassicConnecion(){
         // Проверка доступности Bluetooth
         val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
         if (bluetoothAdapter == null) {
@@ -123,23 +141,6 @@ class MainActivity : AppCompatActivity() {
             outputStream = socket?.outputStream
         }.start()
     }
-
-
-    private fun MonitoringMode() {
-        val buf = ByteBuffer.allocate(4)
-        buf.putChar(0.toChar()); // version
-        buf.putChar(4.toChar()); // command MonitoringMode
-        buf.putChar(findViewById<SeekBar>(R.id.rateSlider).progress.toChar()); // set 1000 Hz
-        outputStream?.write(buf.array())
-
-        val layout = findViewById<EcgShowView>(R.id.ecgShow)
-        val ecgShowView = EcgShowView(this, null)
-        //layout.addView(ecgShowView)  //зачем это тут вообще нужно???
-
-        val dataStr = "1,2,3,4,5" // Заменить
-        ecgShowView.setData(dataStr)
-    }
-
 }
 
 

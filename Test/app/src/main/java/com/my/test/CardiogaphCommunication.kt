@@ -1,6 +1,7 @@
 package com.my.test
 
 import android.view.View
+import android.widget.SeekBar
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -11,11 +12,11 @@ class CardiogaphCommunication {
     private var inputStream: InputStream? = null
     private var outputStream: OutputStream? = null
     private val buffer = ByteArray(1024)
-    fun ReadDeviceInformation(): String {
-        val buf = ByteBuffer.allocate(4)
 
-        buf.putChar(0.toChar()); // version
-        buf.putChar(0.toChar()); // command ReadDeviceInformation
+    private fun sendCommand(command: Char): String {
+        val buf = ByteBuffer.allocate(4)
+        buf.putChar(0.toChar()) // version
+        buf.putChar(command) // command
 
         outputStream?.write(buf.array())
 
@@ -25,27 +26,24 @@ class CardiogaphCommunication {
 
         return result
     }
+
+    fun ReadDeviceInformation(): String {
+        return sendCommand(0.toChar())
+    }
+
     fun ReadDeviceStatus(): String {
-        val buf = ByteBuffer.allocate(4)
-
-        buf.putChar(0.toChar()); // version
-        buf.putChar(1.toChar()); // command ReadDeviceStatus
-
-        outputStream?.write(buf.array())
-
-        val response = ByteArray(1024)
-        val bytesRead = inputStream?.read(response)
-        val result = response.copyOfRange(0, bytesRead ?: 0).toString(Charsets.UTF_8)
-
-        return result
+        return sendCommand(1.toChar())
     }
 
     fun ReadComponentStatus(): String {
+        return sendCommand(3.toChar())
+    }
+
+    fun MonitoringMode(frequency: Char): String {
         val buf = ByteBuffer.allocate(4)
-
-        buf.putChar(0.toChar()); // version
-        buf.putChar(3.toChar()); // command ReadComponentStatus
-
+        buf.putChar(0.toChar()) // version
+        buf.putChar(4.toChar()) // command MonitoringMode
+        buf.putChar(frequency.toChar())
         outputStream?.write(buf.array())
 
         val response = ByteArray(1024)
@@ -56,17 +54,6 @@ class CardiogaphCommunication {
     }
 
     fun PoverOff(): String {
-        val buf = ByteBuffer.allocate(4)
-
-        buf.putChar(0.toChar()); // version
-        buf.putChar(10.toChar()); // command PoverOff
-
-        outputStream?.write(buf.array())
-
-        val response = ByteArray(1024)
-        val bytesRead = inputStream?.read(response)
-        val result = response.copyOfRange(0, bytesRead ?: 0).toString(Charsets.UTF_8)
-
-        return result
+        return sendCommand(10.toChar())
     }
 }
