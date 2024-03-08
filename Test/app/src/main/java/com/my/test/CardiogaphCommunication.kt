@@ -1,7 +1,6 @@
 package com.my.test
 
-import android.view.View
-import android.widget.SeekBar
+
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
