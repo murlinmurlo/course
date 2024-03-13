@@ -8,9 +8,9 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,9 +22,7 @@ import androidx.core.app.ActivityCompat
 import com.my.test.databinding.ActivityMainBinding
 import java.io.InputStream
 import java.io.OutputStream
-import java.nio.ByteBuffer
 import java.util.UUID
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,9 +40,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var batteryСharge = cardiogaphCommunication.ReadComponentStatus()
         when (item.itemId) {
             android.R.id.home -> finish()
-            R.id.battary -> {Toast.makeText(this, "69%", Toast.LENGTH_SHORT).show()}
+            R.id.battary -> {Toast.makeText(this, "${batteryСharge}%", Toast.LENGTH_SHORT).show()}
         }
         return super.onOptionsItemSelected(item)
     }
@@ -56,13 +55,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         supportActionBar?.apply {
-            setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.lightYellow)))
+            setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.red)))
             setDisplayHomeAsUpEnabled(true)
             title = "Cardiograph"
         }
 
-
-        BluetoothClassicConnecion()
+        //connection to KR-2
+        binding.onClickConnect.setOnClickListener {
+            BluetoothClassicConnection()
+        }
 
         binding.onClickReadDeviceInformation.setOnClickListener {
             var result = cardiogaphCommunication.ReadDeviceInformation()
@@ -73,7 +74,14 @@ class MainActivity : AppCompatActivity() {
         val seekBar = findViewById<SeekBar>(R.id.rateSlider)
         seekBar.max = 1000
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, samplingRate: Int, fromUser: Boolean) {}
+            override fun onProgressChanged(seekBar: SeekBar, samplingRate: Int, fromUser: Boolean) {
+                var frequency = 0
+                when (samplingRate) {
+                    0 -> frequency = 1 //250 Hz
+                    1 -> frequency = 2 //500 Hz
+                    2 -> frequency = 3 //1000 Hz
+                }
+            }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
@@ -87,46 +95,49 @@ class MainActivity : AppCompatActivity() {
             var result = cardiogaphCommunication.MonitoringMode(frequency)
             var text = binding.onClickStartSession.text
             when (text) {
-                "Start session" -> {
-                    text = "Stop session"
-                    "Stop session"
+                "Start" -> {
+                    text = "Stop"
+                    "Stop"
                 }
                 else -> {
-                    text = "Start session"
-                    "Start session"
+                    text = "Start"
+                    "Start"
                 }
             }
             val layout = findViewById<EcgShowView>(R.id.ecgShow)
             val ecgShowView = EcgShowView(this, null)
             //layout.addView(ecgShowView)  //зачем это тут вообще нужно???
 
-            val dataStr = "1,2,3,4,5" // Заменить
+            val dataStr = "1,2,3,4,5" // Заменить на резултат MonitiringMode
             ecgShowView.setData(dataStr)
         }
     }
 
 
-    fun BluetoothClassicConnecion(){
-        // Проверка доступности Bluetooth
+    fun BluetoothClassicConnection() {
+        // Checking Bluetooth availability
         val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
         if (bluetoothAdapter == null) {
-            // Устройство не поддерживает Bluetooth
+            // The device does not support Bluetooth
+            Log.d("BluetoothClassic", "Device does not support Bluetooth")
         }
 
-        // Включение Bluetooth
+        // Enabling Bluetooth
         if (!bluetoothAdapter?.isEnabled!!) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    // Bluetooth включен
+                    // Bluetooth enabled
+                    Log.d("BluetoothClassic", "Bluetooth enabled")
                 } else {
-                    // Пользователь отклонил запрос на включение Bluetooth
+                    // The user declined the request to turn on Bluetooth
+                    Log.d("BluetoothClassic", "User declined to enable Bluetooth")
                 }
             }.launch(enableBtIntent)
         }
 
-        // Поиск устройств
-        if (ActivityCompat.checkSelfPermission(
+        // Device search
+        if (ActivityCompat.checkSelfPermission( // вручную настроить разрешения
                 this,
                 Manifest.permission.BLUETOOTH_SCAN
             ) != PackageManager.PERMISSION_GRANTED
@@ -141,16 +152,19 @@ class MainActivity : AppCompatActivity() {
             return
         }
         bluetoothAdapter?.startDiscovery()
+        Log.d("BluetoothClassic", "Device discovery started")
 
-        // Подключение к устройству
+        // Connecting to the device
         val device: BluetoothDevice? = bluetoothAdapter?.getRemoteDevice(deviceAddress)
         val socket: BluetoothSocket? = device?.createRfcommSocketToServiceRecord(UUID.fromString(uuid))
         Thread {
             socket?.connect()
             inputStream = socket?.inputStream
             outputStream = socket?.outputStream
+            Log.d("BluetoothClassic", "Connected to device")
         }.start()
     }
+
 }
 
 

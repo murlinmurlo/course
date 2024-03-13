@@ -87,7 +87,7 @@ class EcgShowView : View {
         paint!!.reset()
         path!!.reset()
         paint!!.style = Paint.Style.STROKE
-        paint!!.color = Color.parseColor("#31CE32")
+        paint!!.color = Color.parseColor("red")
         paint!!.strokeWidth = mGridLinestrokeWidth
         paint!!.isAntiAlias = true
         path!!.moveTo(0f, mHeight / 2)

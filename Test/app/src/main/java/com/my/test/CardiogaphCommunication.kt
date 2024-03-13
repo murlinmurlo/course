@@ -46,7 +46,7 @@ class CardiogaphCommunication {
         val buf = ByteBuffer.allocate(4)
         buf.putChar(0.toChar()) // version
         buf.putChar(4.toChar()) // command MonitoringMode
-        buf.putChar(frequency.toChar())
+        buf.putChar(frequency.toChar()) // set frequency
         outputStream?.write(buf.array())
 
         val response = ByteArray(1024)
