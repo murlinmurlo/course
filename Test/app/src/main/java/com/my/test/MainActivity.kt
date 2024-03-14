@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     private val uuid = "00001101-0000-1000-8000-00805f9b34fb"
     private var inputStream: InputStream? = null
     private var outputStream: OutputStream? = null
-    private val buffer = ByteArray(1024)
+
     private var cardiogaphCommunication = CardiogaphCommunication()
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.onClickStartSession.setOnClickListener {
             var frequency = findViewById<SeekBar>(R.id.rateSlider).progress.toChar()
-            var result = cardiogaphCommunication.MonitoringMode(frequency)
+            //var result = cardiogaphCommunication.MonitoringMode(frequency)
             var text = binding.onClickStartSession.text
             when (text) {
                 "Start" -> {
@@ -108,8 +108,8 @@ class MainActivity : AppCompatActivity() {
             val ecgShowView = EcgShowView(this, null)
             //layout.addView(ecgShowView)  //зачем это тут вообще нужно???
 
-            val dataStr = "1,2,3,4,5" // Заменить на резултат MonitiringMode
-            ecgShowView.setData(dataStr)
+            var dataStr = cardiogaphCommunication.MonitoringMode(frequency) // Заменить на резултат MonitiringMode
+            //ecgShowView.setData(dataStr)
         }
     }
 

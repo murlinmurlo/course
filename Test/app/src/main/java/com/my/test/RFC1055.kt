@@ -1,4 +1,5 @@
-package com.my.test
+package com.my.readdeviceinformation
+
 
 object RFC1055 {
     const val END: Byte = 0xC0.toByte()
