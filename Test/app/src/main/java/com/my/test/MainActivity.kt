@@ -62,7 +62,18 @@ class MainActivity : AppCompatActivity() {
 
         //connection to KR-2
         binding.onClickConnect.setOnClickListener {
-            BluetoothClassicConnection()
+            var flag = true
+            val socket = BluetoothClassicConnect()
+
+                if (flag) {
+                    BluetoothClassicConnect()
+                    flag = false
+                } else {
+                    if (socket != null) {
+                        BluetoothClassicDisconnect(socket)
+                    }
+                    flag = true
+                }
         }
 
         binding.onClickReadDeviceInformation.setOnClickListener {
@@ -114,7 +125,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun BluetoothClassicConnection() {
+    fun BluetoothClassicConnect(): BluetoothSocket? {
         // Checking Bluetooth availability
         val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
         if (bluetoothAdapter == null) {
@@ -149,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            return
+            return null
         }
         bluetoothAdapter?.startDiscovery()
         Log.d("BluetoothClassic", "Device discovery started")
@@ -163,8 +174,17 @@ class MainActivity : AppCompatActivity() {
             outputStream = socket?.outputStream
             Log.d("BluetoothClassic", "Connected to device")
         }.start()
+
+        return socket
     }
 
+    fun BluetoothClassicDisconnect(socket: BluetoothSocket) {
+        // Закрыть Bluetooth-сокет и освободить ресурсы
+        inputStream?.close()
+        outputStream?.close()
+        socket?.close()
+        Log.d("BluetoothClassic", "Отключение от устройства")
+    }
 }
 
 

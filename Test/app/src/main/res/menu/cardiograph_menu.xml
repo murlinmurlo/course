@@ -7,5 +7,4 @@
         android:icon="@drawable/battary"
         app:showAsAction="ifRoom"
         />
-
 </menu>
