@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private val uuid = "00001101-0000-1000-8000-00805f9b34fb"
     private var inputStream: InputStream? = null
     private var outputStream: OutputStream? = null
+    private var flag = true
 
     private var cardiogaphCommunication = CardiogaphCommunication()
 
@@ -40,10 +41,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        var batteryСharge = cardiogaphCommunication.ReadComponentStatus()
+        var battaryCharge = cardiogaphCommunication.ReadComponentStatus()
         when (item.itemId) {
             android.R.id.home -> finish()
-            R.id.battary -> {Toast.makeText(this, "${batteryСharge}%", Toast.LENGTH_SHORT).show()}
+            R.id.battary -> {Toast.makeText(this, "${battaryCharge}%", Toast.LENGTH_SHORT).show()}
         }
         return super.onOptionsItemSelected(item)
     }
@@ -55,25 +56,26 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         supportActionBar?.apply {
-            setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.red)))
+            setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.lightYellow)))
             setDisplayHomeAsUpEnabled(true)
             title = "Cardiograph"
         }
 
         //connection to KR-2
         binding.onClickConnect.setOnClickListener {
-            var flag = true
             val socket = BluetoothClassicConnect()
 
-                if (flag) {
-                    BluetoothClassicConnect()
-                    flag = false
-                } else {
-                    if (socket != null) {
-                        BluetoothClassicDisconnect(socket)
-                    }
-                    flag = true
+            if (flag) {
+                BluetoothClassicConnect()
+                flag = false
+                binding.onClickConnect.text = "Disconnect"
+            } else {
+                if (socket != null) {
+                    BluetoothClassicDisconnect(socket)
+                    binding.onClickConnect.text = "Connect"
                 }
+                flag = true // Переключение состояния обратно
+            }
         }
 
         binding.onClickReadDeviceInformation.setOnClickListener {
@@ -120,12 +122,12 @@ class MainActivity : AppCompatActivity() {
             //layout.addView(ecgShowView)  //зачем это тут вообще нужно???
 
             var dataStr = cardiogaphCommunication.MonitoringMode(frequency) // Заменить на резултат MonitiringMode
-            //ecgShowView.setData(dataStr)
+            ecgShowView.setData(dataStr.toString())
         }
     }
 
 
-    fun BluetoothClassicConnect(): BluetoothSocket? {
+    private fun BluetoothClassicConnect(): BluetoothSocket? {
         // Checking Bluetooth availability
         val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
         if (bluetoothAdapter == null) {
@@ -178,7 +180,7 @@ class MainActivity : AppCompatActivity() {
         return socket
     }
 
-    fun BluetoothClassicDisconnect(socket: BluetoothSocket) {
+    private fun BluetoothClassicDisconnect(socket: BluetoothSocket) {
         // Закрыть Bluetooth-сокет и освободить ресурсы
         inputStream?.close()
         outputStream?.close()

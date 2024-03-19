@@ -207,3 +207,4 @@ private fun BluetoothLeScannerViewPreview() {
     val mutableFloatingButtonBuilder = remember { mutableStateOf<FloatingButtonBuilder>({}) }
     MaterialTheme(colorScheme) { BluetoothLeScannerView(mutableFloatingButtonBuilder) { } }
 }
+

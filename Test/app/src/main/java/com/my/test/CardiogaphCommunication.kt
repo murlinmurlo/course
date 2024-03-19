@@ -100,7 +100,6 @@ class CardiogaphCommunication {
 
         val buf = ByteBuffer.allocate(encodedCommand.size)
         buf.put(encodedCommand)
-        Log.d("PowerOff", "COMMAND TO SEND: ${encodedCommand}")
         buf.flip()
         outputStream?.write(buf.array())
     }
@@ -108,8 +107,9 @@ class CardiogaphCommunication {
     fun MonitoringMode(frequency: Char): ByteArray?{
         val command = listOf<Byte>(
             0x00.toByte(),
-            0x02.toByte(),
             0x04.toByte(),
+            0x03.toByte(),
+            0x0a.toByte()
         )
         val encodedCommand = RFC1055.encode(command)
 
